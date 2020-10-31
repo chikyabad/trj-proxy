@@ -17,7 +17,7 @@ public class TRJAppProxy extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private static final String REFINERY_ECC_LIN_BASIC = "Refinery_ECC_LIN_BASIC";
-	Logger loc = LoggerFactory.getLogger(BackendHandler.class);
+	Logger log = LoggerFactory.getLogger(BackendHandler.class);
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		proxyTrjApp(request,response);
@@ -39,14 +39,14 @@ public class TRJAppProxy extends HttpServlet {
 				backendURL.concat("&GV_REFNO=" + referenceNumParameter);
 			}
 			URL url = new URL(backendURL);
-			loc.info("Backend URL: "+ backendURL);
+			log.info("Backend URL: "+ backendURL);
 			
 			// Create connection object
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			
 			// Set request HTTP method
 			connection.setRequestMethod(request.getMethod());
-			loc.info("Request HTTP Method: " + request.getMethod());
+			log.info("Request HTTP Method: " + request.getMethod());
 			
 			// Set request HTTP header
 			connection.setRequestProperty("Content-Type", request.getContentType());
@@ -59,16 +59,17 @@ public class TRJAppProxy extends HttpServlet {
 			connection.setDoInput(false);
 			connection.setDoOutput(true);
 			connection.connect();
-			loc.info("Backend Response Code:" + String.valueOf(connection.getResponseCode()));
 			
 			// Reset response
 			response.reset();
 			
 			// Set response header
 			response.setContentType(connection.getContentType());
+			log.info("Backend Response Content-Type:" + connection.getContentType());
 
 			// Set response HTTP code
 			response.setStatus(connection.getResponseCode());
+			log.info("Backend Response Code:" + String.valueOf(connection.getResponseCode()));
 			
 			// Set response body
 			OutputStream os = response.getOutputStream();
@@ -78,11 +79,11 @@ public class TRJAppProxy extends HttpServlet {
 			
 		} catch (IOException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			loc.info("IOException: "+ e);
+			log.info("IOException: "+ e);
 
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			loc.info("Exception: "+ e);
+			log.info("Exception: "+ e);
 		}
 	}
 	

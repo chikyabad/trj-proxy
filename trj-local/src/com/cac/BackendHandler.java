@@ -14,7 +14,7 @@ import com.sap.core.connectivity.api.configuration.DestinationConfiguration;
 
 public class BackendHandler {
 
-	Logger loc = LoggerFactory.getLogger(BackendHandler.class);
+	Logger log = LoggerFactory.getLogger(BackendHandler.class);
 
 	DestinationConfiguration destConfiguration;
 
@@ -32,7 +32,7 @@ public class BackendHandler {
 
 		} catch (NamingException e) {
 			e.printStackTrace();
-			loc.error("Error while fetching destination" + e);
+			log.error("Error while fetching destination" + e);
 		}
 
 	}
@@ -44,7 +44,7 @@ public class BackendHandler {
 			// get the destination URL
 			url = destConfiguration.getProperty("URL");
 
-			loc.info("Destination URL: " + url);
+			log.info("Destination URL: " + url);
 		}
 
 		return url;
@@ -57,7 +57,7 @@ public class BackendHandler {
 			// get the destination user
 			userid = destConfiguration.getProperty("User");
 
-			loc.info("Destinatinon Userid: " + userid);
+			log.info("Destinatinon Userid: " + userid);
 		}
 
 		return userid;
