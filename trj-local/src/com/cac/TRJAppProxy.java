@@ -54,10 +54,8 @@ public class TRJAppProxy extends HttpServlet {
      		String authHeaderValue = Base64.getEncoder().encodeToString(auth.getBytes("utf-8")); 
 			connection.setRequestProperty("Authorization", authHeaderValue);
 			connection.setRequestProperty("SAP-Connectivity-SCC-Location_ID", backendhandler.getLocationId());
-
+			
 			// Execute connection
-			connection.setDoInput(false);
-			connection.setDoOutput(true);
 			connection.connect();
 			
 			// Reset response
@@ -72,10 +70,10 @@ public class TRJAppProxy extends HttpServlet {
 			log.info("Backend Response Code:" + String.valueOf(connection.getResponseCode()));
 			
 			// Set response body
-			OutputStream os = response.getOutputStream();
-			this.copyStream(connection.getInputStream(), os);
-			os.flush();
-			os.close();	
+			OutputStream osRes = response.getOutputStream();
+			this.copyStream(connection.getInputStream(), osRes);
+			osRes.flush();
+			osRes.close();		
 			
 		} catch (IOException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
