@@ -20,9 +20,14 @@ public class TRJAppProxy extends HttpServlet {
 	Logger log = LoggerFactory.getLogger(BackendHandler.class);
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		log.info("Executing GET operation.");
 		proxyTrjApp(request,response);
 	}
 	
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		log.info("Executing POST operation.");
+	}
+		
 	private void proxyTrjApp(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		
 		try {
@@ -46,7 +51,6 @@ public class TRJAppProxy extends HttpServlet {
 			
 			// Set request HTTP method
 			connection.setRequestMethod(request.getMethod());
-			log.info("Request HTTP Method: " + request.getMethod());
 			
 			// Set request HTTP header
 			connection.setRequestProperty("Content-Type", request.getContentType());
