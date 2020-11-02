@@ -6,6 +6,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
+
+import javax.security.auth.login.LoginContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TRJAppProxy extends HttpServlet {
+import com.sap.security.auth.login.LoginContextFactory;
+
+public class TRJAppProxy extends HttpServlet {	
 
 	private static final long serialVersionUID = 1L;
 	private static final String REFINERY_ECC_LIN_BASIC = "Refinery_ECC_LIN_BASIC";
@@ -39,25 +43,31 @@ public class TRJAppProxy extends HttpServlet {
 			String languageParameter = "?sap-language=en";
 			String userParameter = "&GV_USRID=" + request.getUserPrincipal().getName();
 			String referenceNumParameter = request.getParameter("GV_REFNO");
-			String backendURL = backendhandler.getServiceUrl() + languageParameter +userParameter;
+			String backendURL = backendhandler.getServiceUrl() + languageParameter + userParameter;
 			if (referenceNumParameter != null){
 				backendURL.concat("&GV_REFNO=" + referenceNumParameter);
 			}
-			URL url = new URL(backendURL);
+			URL url = new URL(backendURL);	
 			log.info("Backend URL: "+ backendURL);
 			
 			// Create connection object
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection(backendhandler.getProxy());
 			
 			// Set request HTTP method
 			connection.setRequestMethod(request.getMethod());
 			
 			// Set request HTTP header
 			connection.setRequestProperty("Content-Type", request.getContentType());
+			connection.setRequestProperty("Accept", request.getHeader("Accept"));
+			connection.setRequestProperty("SAP-Connectivity-SCC-Location_ID", backendhandler.getLocationId());
+			
+			// Set authentication
+			LoginContext loginContext;
+			loginContext = LoginContextFactory.createLoginContext("FORM");
+			loginContext.login();
      		String auth = backendhandler.getUserId() + ":" + backendhandler.getPassword(); 
      		String authHeaderValue = Base64.getEncoder().encodeToString(auth.getBytes("utf-8")); 
 			connection.setRequestProperty("Authorization", authHeaderValue);
-			connection.setRequestProperty("SAP-Connectivity-SCC-Location_ID", backendhandler.getLocationId());
 			
 			// Execute connection
 			connection.connect();
@@ -95,5 +105,14 @@ public class TRJAppProxy extends HttpServlet {
 		while ((bytesRead = input.read(buffer)) != -1) {
 			output.write(buffer, 0, bytesRead);
 		}
+	}
+	
+	private String getDestination (String systemParameter) {
+		String destination = "";
+		switch (systemParameter) {
+			case "refinery":
+				return REFINERY_ECC_LIN_BASIC;
+		}
+		return destination;
 	}
 }

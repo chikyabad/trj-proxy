@@ -1,6 +1,8 @@
 package com.cac;
 
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -85,4 +87,22 @@ public class BackendHandler {
 		
 		return locationId;
 	}
+	
+	public Proxy getProxy() {
+
+        String proxyHost = null;
+        String proxyPortString = null;
+
+        proxyHost = System.getenv("HC_OP_HTTP_PROXY_HOST");
+        proxyPortString = System.getenv("HC_OP_HTTP_PROXY_PORT");
+
+        log.info("proxyHost = {} / proxyPort = {}", proxyHost, proxyPortString);
+
+        if (proxyPortString != null && proxyHost != null) {
+            return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, Integer.parseInt(proxyPortString)));
+        } else {
+            return Proxy.NO_PROXY;
+        }
+    }
+
 }
